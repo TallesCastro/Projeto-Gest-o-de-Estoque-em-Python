@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import random
 import time
 
+
 # Função para criar tabelas no banco de dados SQLite
 def criar_tabelas():
     conn = sqlite3.connect('estoque.db')
@@ -29,9 +30,10 @@ def criar_tabelas():
         FOREIGN KEY (produto_id) REFERENCES produtos(id)
     )
     ''')
-    
+
     conn.commit()
     conn.close()
+
 
 # Função para adicionar um novo produto
 def adicionar_produto(nome, quantidade):
@@ -40,6 +42,7 @@ def adicionar_produto(nome, quantidade):
     cursor.execute("INSERT INTO produtos (nome, quantidade) VALUES (?, ?)", (nome, quantidade))
     conn.commit()
     conn.close()
+
 
 # Função para registrar uma movimentação (entrada ou saída de estoque)
 def registrar_movimentacao(produto_id, tipo, quantidade):
@@ -51,12 +54,14 @@ def registrar_movimentacao(produto_id, tipo, quantidade):
         cursor.execute("UPDATE produtos SET quantidade = quantidade + ? WHERE id = ?", (quantidade, produto_id))
     elif tipo == 'saida':
         cursor.execute("UPDATE produtos SET quantidade = quantidade - ? WHERE id = ?", (quantidade, produto_id))
-    
+
     # Registrar movimentação
-    cursor.execute("INSERT INTO movimentacoes (produto_id, tipo, quantidade) VALUES (?, ?, ?)", (produto_id, tipo, quantidade))
-    
+    cursor.execute("INSERT INTO movimentacoes (produto_id, tipo, quantidade) VALUES (?, ?, ?)",
+                   (produto_id, tipo, quantidade))
+
     conn.commit()
     conn.close()
+
 
 # Função para consultar o estoque atual
 def consultar_estoque():
@@ -65,6 +70,7 @@ def consultar_estoque():
     conn.close()
     return df
 
+
 # Função para consultar movimentações e gerar gráfico
 def consultar_movimentacoes(produto_id):
     conn = sqlite3.connect('estoque.db')
@@ -72,7 +78,8 @@ def consultar_movimentacoes(produto_id):
     conn.close()
 
     df['data'] = pd.to_datetime(df['data'])
-    df['quantidade_acumulada'] = df.apply(lambda row: row['quantidade'] if row['tipo'] == 'entrada' else -row['quantidade'], axis=1).cumsum()
+    df['quantidade_acumulada'] = df.apply(
+        lambda row: row['quantidade'] if row['tipo'] == 'entrada' else -row['quantidade'], axis=1).cumsum()
 
     plt.figure(figsize=(10, 5))
     plt.plot(df['data'], df['quantidade_acumulada'], marker='o')
@@ -81,6 +88,7 @@ def consultar_movimentacoes(produto_id):
     plt.ylabel('Quantidade Acumulada')
     plt.grid(True)
     plt.show()
+
 
 # Função para simular movimentações automáticas
 def simular_movimentacao_automatica(produto_id, n_movimentacoes):
@@ -91,15 +99,24 @@ def simular_movimentacao_automatica(produto_id, n_movimentacoes):
         print(f"Movimentação registrada: {tipo} de {quantidade} unidades para o produto {produto_id}")
         time.sleep(1)
 
+
 # Função principal
 def controle_de_estoque():
     criar_tabelas()
 
     # Adicionar um produto
     adicionar_produto("Parafusos", 100)
+    adicionar_produto("Òleo", 50)
+    adicionar_produto("Manete", 25)
+    adicionar_produto("Paralama", 2)
+
 
     # Simular movimentações automáticas
-    produto_id = 1  # Supondo que o produto 'Parafusos' tem o ID 1
+    produto_id = 1
+    produto_id = 2
+    produto_id = 3
+    produto_id = 4
+    # Supondo que o produto 'Parafusos' tem o ID 1
     simular_movimentacao_automatica(produto_id, 10)
 
     # Consultar e mostrar o estoque atual
@@ -110,6 +127,8 @@ def controle_de_estoque():
     # Consultar e mostrar gráfico das movimentações
     consultar_movimentacoes(produto_id)
 
+
 if __name__ == "__main__":
     controle_de_estoque()
+
 
