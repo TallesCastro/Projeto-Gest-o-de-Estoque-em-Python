@@ -1,0 +1,57 @@
+#Classe que representa um item no estoque
+class ItemEstoque:
+    def __init__(self, nome, quantidade, preco_unitario):
+        self.nome = nome
+        self.quantidade = quantidade
+        self.preco_unitario = preco_unitario
+
+    def __str__(self):
+        return f"{self.nome} - Quantidade: {self.quantidade}, Preço Unitário: R${self.preco_unitario:.2f}"
+
+# Classe para gerenciar o estoque
+class GestaoEstoque:
+    def __init__(self):
+        self.estoque = {}
+
+    def adicionar_item(self, nome, quantidade, preco_unitario):
+        if nome in self.estoque:
+            self.estoque[nome].quantidade += quantidade
+        else:
+            self.estoque[nome] = ItemEstoque(nome, quantidade, preco_unitario)
+        print(f"Item '{nome}' adicionado ao estoque.")
+
+    def remover_item(self, nome, quantidade):
+        if nome in self.estoque and self.estoque[nome].quantidade >= quantidade:
+            self.estoque[nome].quantidade -= quantidade
+            print(f"{quantidade} unidade(s) de '{nome}' removida(s) do estoque.")
+            if self.estoque[nome].quantidade == 0:
+                del self.estoque[nome]
+        else:
+            print(f"Não foi possível remover {quantidade} unidade(s) de '{nome}' (quantidade insuficiente ou item não encontrado).")
+
+    def exibir_estoque(self):
+        if self.estoque:
+            print("Estoque Atual:")
+            for item in self.estoque.values():
+                print(item)
+        else:
+            print("Estoque vazio.")
+
+# Exemplo de uso
+if __name__ == "__main__":
+    # Inicializa o sistema de gestão de estoque
+    estoque = GestaoEstoque()
+
+    # Adiciona itens ao estoque
+    estoque.adicionar_item("Manete", 10, 50.00)
+    estoque.adicionar_item("Cabo de Embreagem", 15, 25.00)
+    estoque.adicionar_item("Òleo", 50, 35.00)
+
+    # Exibe o estoque atual
+    estoque.exibir_estoque()
+
+    # Remove alguns itens
+    estoque.remover_item("Òleo", 3)
+
+    # Exibe o estoque novamente
+    estoque.exibir_estoque()
